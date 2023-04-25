@@ -6,24 +6,27 @@ package frc.robot.commands.launcher;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
+import frc.robot.Constants;
+import frc.robot.subsystems.Launcher;
 
-// NOTE:  Consider using this command inline, rather than writing a subclass.  For more
-// information, see:
-// https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class SetHoodPosition extends PIDCommand {
+
   /** Creates a new SetHoodPosition. */
-  public SetHoodPosition() {
+  public SetHoodPosition(int hoodAngle, Launcher m_launcher) {
     super(
         // The controller that the command will use
-        new PIDController(0, 0, 0),
+        new PIDController(Constants.LauncherConstants.HOOD_KP
+              , Constants.LauncherConstants.HOOD_KI
+              , Constants.LauncherConstants.HOOD_KD
+            ),
         // This should return the measurement
-        () -> 0,
+        m_launcher::getHoodPosition,
         // This should return the setpoint (can also be a constant)
-        () -> 0,
+        hoodAngle,
         // This uses the output
-        output -> {
-          // Use the output here
-        });
+        output -> m_launcher.setHoodVoltage(output),
+        m_launcher 
+    );
     // Use addRequirements() here to declare subsystem dependencies.
     // Configure additional PID options by calling `getController` here.
   }
@@ -31,6 +34,6 @@ public class SetHoodPosition extends PIDCommand {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return getController().atSetpoint();
   }
 }

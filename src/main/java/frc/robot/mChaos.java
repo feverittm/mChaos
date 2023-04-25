@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.launcher.SetHoodPosition;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Indexer;
@@ -39,6 +40,8 @@ public class mChaos {
   private final Command m_hoodUp = Commands.runOnce(() -> m_launcher.setHoodVoltage(0.3));
   private final Command m_hoodDown = Commands.runOnce(() -> m_launcher.setHoodVoltage(-0.3));
 
+  private final Command m_setHoodPosition = new SetHoodPosition(100, m_launcher);
+ 
   /**
    * Use this method to define bindings between conditions and commands. These are
    * useful for
@@ -67,10 +70,12 @@ public class mChaos {
     m_driverController.a().onTrue(m_hoodUp).onFalse(m_hoodStop);
     m_driverController.b().onTrue(m_hoodDown).onFalse(m_hoodStop);
 
+    m_driverController.x().onTrue(m_setHoodPosition);
+
     /*
      * // Fire the shooter with the A button
      * m_driverController
-     * .a()
+     * .x()
      * .onTrue(
      * parallel(
      * m_launcher.shootCommand(LauncherConstants.kShooterTargetRPS))
