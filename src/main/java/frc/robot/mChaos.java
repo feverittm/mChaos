@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class mChaos {
   // The robot's subsystems
   private final Drive m_drive = new Drive();
-  private final Indexer m_intake = new Indexer();
+  private final Indexer m_indexer = new Indexer();
   private final Launcher m_launcher = new Launcher();
 
   // The driver's controller
