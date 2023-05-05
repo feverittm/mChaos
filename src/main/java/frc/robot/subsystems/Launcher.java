@@ -26,6 +26,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
@@ -181,6 +182,14 @@ public class Launcher extends SubsystemBase {
    */
   public double getFlywheelAbsDistanceRadians() {
     return flywheelAbsDisanceRadians;
+  }
+  
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    // Publish encoder distances to telemetry.
+    builder.addDoubleProperty("shooter_velocity", flywheelEncoder::getVelocity, null);
+    builder.addDoubleProperty("hood_position", getHoodPosition(), null);
   }
 
   @Override
