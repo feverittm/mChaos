@@ -9,6 +9,7 @@ import static frc.robot.Constants.IndexerConstants;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,7 +28,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  */
 
 public class Indexer extends SubsystemBase {
-  private final WPI_VictorSPX intakeMotor = new WPI_VictorSPX(IndexerConstants.INDEXER_MOTOR_PORT);
+  private final WPI_VictorSPX intakeMotor = new WPI_VictorSPX(IndexerConstants.INDEXER_MOTOR_CANID);
 
   private final DigitalInput lowerBreakbeam = new DigitalInput(IndexerConstants.LOWER_BREAKBEAM_DIO);
 
@@ -84,6 +85,14 @@ public class Indexer extends SubsystemBase {
 
   public boolean hasBall() {
     return (ballAtLowerBreakbeam() || ballAtUpperBreakbeam());
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    // Publish the breakbeam state to telemetry.
+    builder.addBooleanProperty("upper_breakbeam", () -> upperBreakbeam.get(), null);
+    builder.addBooleanProperty("lower_breakbeam", () -> lowerBreakbeam.get(), null);
   }
 
   @Override

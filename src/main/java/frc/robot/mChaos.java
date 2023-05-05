@@ -116,11 +116,10 @@ public class mChaos {
     // new Trigger(m_storage::isFull).onTrue(m_intake.retractCommand());
 
 
-    m_driverController.a().onTrue(m_hoodUp).onFalse(m_hoodStop);
-    m_driverController.b().onTrue(m_hoodDown).onFalse(m_hoodStop);
+    m_driverController.a().whileTrue(m_hoodUp).onFalse(m_hoodStop);
+    m_driverController.b().whileTrue(m_hoodDown).onFalse(m_hoodStop);
 
     m_driverController.x().onTrue(m_setHoodPosition);
-
     m_driverController.y().onTrue(m_indexBall).onFalse(m_stopIndex);
 
     /*

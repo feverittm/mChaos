@@ -10,40 +10,33 @@ import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.function.DoubleSupplier;
-
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
-
 
 public class Drive extends SubsystemBase {
   // The motors on the left side of the drive.
-  private final MotorControllerGroup m_leftMotors =
-      new MotorControllerGroup(
-          new WPI_VictorSPX(DriveConstants.kLeftMotor1Port),
-          new WPI_VictorSPX(DriveConstants.kLeftMotor2Port));
+  private final MotorControllerGroup m_leftMotors = new MotorControllerGroup(
+      new WPI_VictorSPX(DriveConstants.kLeftMotor1CANID),
+      new WPI_VictorSPX(DriveConstants.kLeftMotor2CANID));
 
   // The motors on the right side of the drive.
-  private final MotorControllerGroup m_rightMotors =
-      new MotorControllerGroup(
-          new WPI_VictorSPX(DriveConstants.kRightMotor1Port),
-          new WPI_VictorSPX(DriveConstants.kRightMotor2Port));
+  private final MotorControllerGroup m_rightMotors = new MotorControllerGroup(
+      new WPI_VictorSPX(DriveConstants.kRightMotor1CANID),
+      new WPI_VictorSPX(DriveConstants.kRightMotor2CANID));
 
   // The robot's drive
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotors, m_rightMotors);
 
   // The left-side drive encoder
-  private final Encoder m_leftEncoder =
-      new Encoder(
-          DriveConstants.kLeftEncoderPorts[0],
-          DriveConstants.kLeftEncoderPorts[1],
-          DriveConstants.kLeftEncoderReversed);
+  private final Encoder m_leftEncoder = new Encoder(
+      DriveConstants.kLeftEncoderDIOs[0],
+      DriveConstants.kLeftEncoderDIOs[1],
+      DriveConstants.kLeftEncoderReversed);
 
   // The right-side drive encoder
-  private final Encoder m_rightEncoder =
-      new Encoder(
-          DriveConstants.kRightEncoderPorts[0],
-          DriveConstants.kRightEncoderPorts[1],
-          DriveConstants.kRightEncoderReversed);
+  private final Encoder m_rightEncoder = new Encoder(
+      DriveConstants.kRightEncoderDIOs[0],
+      DriveConstants.kRightEncoderDIOs[1],
+      DriveConstants.kRightEncoderReversed);
 
   /** Creates a new Drive subsystem. */
   public Drive() {
@@ -71,25 +64,24 @@ public class Drive extends SubsystemBase {
   }
 
   /**
-   * Returns a command that drives the robot forward a specified distance at a specified speed.
+   * Returns a command that drives the robot forward a specified distance at a
+   * specified speed.
    *
    * @param distanceMeters The distance to drive forward in meters
-   * @param speed The fraction of max speed at which to drive
+   * @param speed          The fraction of max speed at which to drive
    */
   public CommandBase driveDistanceCommand(double distanceMeters, double speed) {
     return runOnce(
-            () -> {
-              // Reset encoders at the start of the command
-              m_leftEncoder.reset();
-              m_rightEncoder.reset();
-            })
+        () -> {
+          // Reset encoders at the start of the command
+          m_leftEncoder.reset();
+          m_rightEncoder.reset();
+        })
         // Drive forward at specified speed
         .andThen(run(() -> m_drive.arcadeDrive(speed, 0)))
         // End command when we've traveled the specified distance
         .until(
-            () ->
-                Math.max(m_leftEncoder.getDistance(), m_rightEncoder.getDistance())
-                    >= distanceMeters)
+            () -> Math.max(m_leftEncoder.getDistance(), m_rightEncoder.getDistance()) >= distanceMeters)
         // Stop the drive when the command ends
         .finallyDo(interrupted -> m_drive.stopMotor());
   }

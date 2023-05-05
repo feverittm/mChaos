@@ -6,7 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.math.util.Units;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.revrobotics.SparkMaxAlternateEncoder.Type;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.utils.GearRatioHelper;
 import java.io.File;
@@ -25,13 +24,13 @@ import java.io.File;
  */
 public final class Constants {
   public static final class DriveConstants {
-    public static final int kLeftMotor1Port = 1;
-    public static final int kLeftMotor2Port = 3;
-    public static final int kRightMotor1Port = 2;
-    public static final int kRightMotor2Port = 4;
+    public static final int kLeftMotor1CANID = 1;
+    public static final int kLeftMotor2CANID = 3;
+    public static final int kRightMotor1CANID = 2;
+    public static final int kRightMotor2CANID = 4;
 
-    public static final int[] kLeftEncoderPorts = { 4, 5 };
-    public static final int[] kRightEncoderPorts = { 2, 3 };
+    public static final int[] kLeftEncoderDIOs = { 4, 5 };
+    public static final int[] kRightEncoderDIOs = { 2, 3 };
     public static final boolean kLeftEncoderReversed = false;
     public static final boolean kRightEncoderReversed = true;
 
@@ -47,25 +46,14 @@ public final class Constants {
 
     // Hood
     public static final int HOOD_MOTOR_CANID = 7;
-
     public static final int HOOD_MOTOR_PDP_CHANNEL = 0;
-
     public static final boolean HOOD_MOTOR_INVERTED = false;
-
     public static final GearRatioHelper MOTOR_TO_HOOD = new GearRatioHelper(1, 30);
-
     public static final int[] HOOD_ENCODER_DIO_CHANNEL = { 7, 8 };
-
-    public static final boolean FLYWHEEL_ENCODER_INVERTED = false;
-
     public static final boolean HOOD_ENCODER_INVERTED = false;
-
     public static final int HOOD_LIMIT_SWITCH_DIO = 6;
-
     public static final boolean HOOD_LIMIT_SWITCH_TRUE_WHEN_ACTIVATED = true;
-
     public static final FeedbackDevice HOOD_FEEDBACK_DEVICE = FeedbackDevice.QuadEncoder;
-
     public static final int HOOD_ENCODER_CPR = 2048;
 
     public static final double HOOD_KS = 1.5; // volts
@@ -77,6 +65,7 @@ public final class Constants {
     public static final double HOOD_KI = 2;
     public static final double HOOD_KD = 8;
 
+    public static final int FLYWHEEL_ENCODER_VELOCITY_SMOOTHING_SAMPLES = 10;
     public static final int HOOD_ENCODER_VELOCITY_SMOOTHING_SAMPLES = 10;
 
     public static final double HOOD_MAX_ANGLE = Math.PI / 2;
@@ -110,18 +99,11 @@ public final class Constants {
 
     public static final double FLYWHEEL_MOMENT = 0.04; // kg m^2
 
-    public static final double FLYWHEEL_ENCODER_ERROR_RADIANS_STDDEV = 0.001;
-
-    public static final int FLYWHEEL_ENCODER_VELOCITY_SMOOTHING_SAMPLES = 10;
-
-    public static final Type FLYWHEEL_ENCODER_TYPE = Type.kQuadrature;
-    public static final int FLYWHEEL_ENCODER_CPR = 2048;
-
     public static final GearRatioHelper MOTOR_TO_FLYWHEEL = new GearRatioHelper(18, 22);
   }
 
   public static final class IndexerConstants {
-    public static final int INDEXER_MOTOR_PORT = 5;
+    public static final int INDEXER_MOTOR_CANID = 5;
 
     public static final int LOWER_BREAKBEAM_DIO = 1;
     public static final int UPPER_BREAKBEAM_DIO = 0;
@@ -133,6 +115,7 @@ public final class Constants {
   }
 
   public static final class LEDDisplayConstants {
+    public static final int LED_PWM = 0;
     public static final int DEFAULT_LED_ANIMATION = 0;
     // public static final LEDStripAnimation DEFAULT_LED_ANIMATION = ...
     public static final int LAUNCHER_PREPARING_LED_ANIMATION = 0;

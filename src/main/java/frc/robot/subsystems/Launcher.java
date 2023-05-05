@@ -22,16 +22,12 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LauncherConstants;
@@ -55,30 +51,6 @@ public class Launcher extends SubsystemBase {
 
   private final Encoder hoodAngleEncoder = new Encoder(LauncherConstants.HOOD_ENCODER_DIO_CHANNEL[0],
       LauncherConstants.HOOD_ENCODER_DIO_CHANNEL[1]);
-
-  private final SingleJointedArmSim hoodSim = new SingleJointedArmSim(
-      DCMotor.getBag(1),
-      (1 / LauncherConstants.MOTOR_TO_HOOD.toDoubleRatioInputToOutput()),
-      LauncherConstants.HOOD_MOMENT,
-      LauncherConstants.HOOD_RADIUS_METERS,
-      0,
-      LauncherConstants.HOOD_MAX_ANGLE,
-      true,
-      VecBuilder.fill(LauncherConstants.HOOD_ENCODER_ERROR_RADIANS_STDDEV));
-
-  private final FlywheelSim flywheelSim = new FlywheelSim(
-      DCMotor.getNEO(2),
-      1 / LauncherConstants.MOTOR_TO_FLYWHEEL.toDoubleRatioInputToOutput(),
-      LauncherConstants.FLYWHEEL_MOMENT,
-      VecBuilder.fill(LauncherConstants.FLYWHEEL_ENCODER_ERROR_RADIANS_STDDEV));
-
-  private double hoodAbsDistanceRadians = 0;
-  private double flywheelAbsDisanceRadians = 0;
-
-  private double previousHoodAngleRadians = 0;
-  private double previousFlywheelVelocityRadiansPerSecond = 0;
-
-  private double approximateFlywheelAcceleration = 0;
 
   /** */
   public Launcher() {
@@ -108,8 +80,6 @@ public class Launcher extends SubsystemBase {
   public void setFlywheelVoltage(double voltage) {
     forwardFlywheelMotor.setVoltage(voltage);
     aftFlywheelMotor.setVoltage(voltage);
-
-    flywheelSim.setInputVoltage(voltage);
   }
 
   /** */
@@ -133,7 +103,6 @@ public class Launcher extends SubsystemBase {
       }
     }
 
-    hoodSim.setInputVoltage(toApply);
     hoodMotor.set(ControlMode.PercentOutput, toApply / RobotController.getBatteryVoltage());
   }
 
@@ -141,76 +110,32 @@ public class Launcher extends SubsystemBase {
    * @return
    */
   public double getHoodPosition() {
-    if (Robot.isReal()) {
-      return LauncherConstants.MOTOR_TO_HOOD.outputFromInput(
-          hoodAngleEncoder.get() / LauncherConstants.HOOD_ENCODER_CPR);
-    } else {
-      return hoodSim.getAngleRads();
-    }
+    return LauncherConstants.MOTOR_TO_HOOD.outputFromInput(
+        hoodAngleEncoder.get() / LauncherConstants.HOOD_ENCODER_CPR);
   }
 
   /**
    * @return
    */
   public double getFlywheelVelocityRadiansPerSecond() {
-    if (Robot.isReal()) {
-      return flywheelVelocityFilter.calculate(
-          LauncherConstants.MOTOR_TO_FLYWHEEL.outputFromInput(
-              Units.rotationsPerMinuteToRadiansPerSecond(
-                  flywheelEncoder.getVelocity())));
-    } else {
-      return flywheelSim.getAngularVelocityRadPerSec();
-    }
+    return flywheelVelocityFilter.calculate(
+        LauncherConstants.MOTOR_TO_FLYWHEEL.outputFromInput(
+            Units.rotationsPerMinuteToRadiansPerSecond(
+                flywheelEncoder.getVelocity())));
   }
 
-  /**
-   * @return
-   */
-  public double getFlywheelAccelerationRadiansPerSecondSquared() {
-    return approximateFlywheelAcceleration;
-  }
-
-  /**
-   * @return
-   */
-  public double getHoodAbsDistanceRadians() {
-    return hoodAbsDistanceRadians;
-  }
-
-  /**
-   * @return
-   */
-  public double getFlywheelAbsDistanceRadians() {
-    return flywheelAbsDisanceRadians;
-  }
-  
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     // Publish encoder distances to telemetry.
     builder.addDoubleProperty("shooter_velocity", flywheelEncoder::getVelocity, null);
-    builder.addDoubleProperty("hood_position", getHoodPosition(), null);
+    builder.addDoubleProperty("hood_position", () -> getHoodPosition(), null);
   }
 
   @Override
   public void periodic() {
     SmartDashboard.putBoolean("Hood Limit Switch", hoodLimitSwitch.get());
-    SmartDashboard.putNumber("Hood Position:", hoodAngleEncoder.get());
-    SmartDashboard.putNumber("Calc Hood Position", getHoodPosition());
-    
-    hoodAbsDistanceRadians += Math.abs(getHoodPosition() - previousHoodAngleRadians);
-    flywheelAbsDisanceRadians += Math.abs(getFlywheelVelocityRadiansPerSecond() * 0.02);
-
-    approximateFlywheelAcceleration = (getFlywheelVelocityRadiansPerSecond() - previousFlywheelVelocityRadiansPerSecond)
-        / 0.02;
-
-    previousHoodAngleRadians = getHoodPosition();
-    previousFlywheelVelocityRadiansPerSecond = getFlywheelVelocityRadiansPerSecond();
-  }
-
-  @Override
-  public void simulationPeriodic() {
-    hoodSim.update(0.02);
-    flywheelSim.update(0.02);
+    SmartDashboard.putNumber("Raw Hood Position:", hoodAngleEncoder.getRaw());
+    // SmartDashboard.putNumber("Calc Hood Position", hoodAngleEncoder.get);
   }
 }
