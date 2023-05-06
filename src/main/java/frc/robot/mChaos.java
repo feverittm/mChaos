@@ -5,7 +5,9 @@
 package frc.robot;
 
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.launcher.SetFlywheelSpeed;
 import frc.robot.commands.launcher.SetHoodPosition;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Indexer;
@@ -15,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -39,12 +42,11 @@ public class mChaos {
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
 
   // Retained command references
-  private final Command m_hoodStop = Commands.runOnce(() -> m_launcher.setHoodVoltage(0.0));
-  private final Command m_hoodUp = Commands.runOnce(() -> m_launcher.setHoodVoltage(0.3));
-  private final Command m_hoodDown = Commands.runOnce(() -> m_launcher.setHoodVoltage(-0.3));
+  private final Command m_hoodStop = Commands.run(() -> m_launcher.setHoodVoltage(0.0));
+  private final Command m_hoodUp = Commands.run(() -> m_launcher.setHoodVoltage(0.3));
+  private final Command m_hoodDown = Commands.run(() -> m_launcher.setHoodVoltage(-0.3));
   
   private final Command m_indexBall = Commands.runOnce(() -> m_indexer.indexBall());
-  private final Command m_stopIndex = Commands.runOnce(() -> m_indexer.stopIndexer());
 
   private final Command m_setHoodPosition = new SetHoodPosition(100, m_launcher);
 
@@ -104,6 +106,10 @@ public class mChaos {
             command ->
                 Shuffleboard.addEventMarker(
                     "Command finished", command.getName(), EventImportance.kNormal));
+
+    SmartDashboard.putData(m_drive);
+    SmartDashboard.putData(m_launcher);
+    SmartDashboard.putData(m_indexer);
   }
 
   public void configureBindings() {
@@ -118,22 +124,12 @@ public class mChaos {
 
     m_driverController.a().whileTrue(m_hoodUp).onFalse(m_hoodStop);
     m_driverController.b().whileTrue(m_hoodDown).onFalse(m_hoodStop);
+    m_driverController.rightBumper().onTrue(m_setHoodPosition);
 
-    m_driverController.x().onTrue(m_setHoodPosition);
-    m_driverController.y().onTrue(m_indexBall).onFalse(m_stopIndex);
-
-    /*
-     * // Fire the shooter with the A button
-     * m_driverController
-     * .x()
-     * .onTrue(
-     * parallel(
-     * m_launcher.shootCommand(LauncherConstants.kShooterTargetRPS))
-     * // m_storage.runCommand())
-     * // Since we composed this inline we should give it a name
-     * .withName("Shoot"));
-     * 
-     */
+    m_driverController.x().onTrue(m_indexBall);
+    m_driverController.leftBumper().toggleOnTrue(
+      new SetFlywheelSpeed(Constants.LauncherConstants.kShooterTargetRPS, m_launcher)
+    );
   }
 
   /**

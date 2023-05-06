@@ -95,7 +95,7 @@ public final class Constants {
     public static final double FLYWHEEL_KI = 0.000005;
     public static final double FLYWHEEL_KD = 0;
 
-    public static final double kShooterTargetRPS = 5000.0;
+    public static final int kShooterTargetRPS = 5000;
 
     public static final double FLYWHEEL_MOMENT = 0.04; // kg m^2
 
@@ -117,11 +117,8 @@ public final class Constants {
   public static final class LEDDisplayConstants {
     public static final int LED_PWM = 0;
     public static final int DEFAULT_LED_ANIMATION = 0;
-    // public static final LEDStripAnimation DEFAULT_LED_ANIMATION = ...
     public static final int LAUNCHER_PREPARING_LED_ANIMATION = 0;
-    // public static final LEDStripAnimation LAUNCHER_PREPARING_LED_ANIMATION = ...
     public static final int LAUNCHER_LAUNCHING_LED_ANIMATION = 0;
-    // public static final LEDStripAnimation LAUNCHER_LAUNCHING_LED_ANIMATION = ...
   }
 
   public static final class AutoConstants {

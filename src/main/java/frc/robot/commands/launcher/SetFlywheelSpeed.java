@@ -14,7 +14,7 @@ import frc.robot.Constants;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class SetFlywheelSpeed extends PIDCommand {
   /** Creates a new SetFlywheelSpeed. */
-  public SetFlywheelSpeed(int ShooterRPM, Launcher m_launcher) {
+  public SetFlywheelSpeed(int ShooterRPM, Launcher c_launcher) {
     super(
         // The controller that the command will use
         new PIDController(Constants.LauncherConstants.FLYWHEEL_KP
@@ -22,12 +22,12 @@ public class SetFlywheelSpeed extends PIDCommand {
             , Constants.LauncherConstants.FLYWHEEL_KD
             ),
         // This should return the measurement
-        m_launcher::getFlywheelVelocityRadiansPerSecond,
+        c_launcher::getFlywheelVelocityRadiansPerSecond,
         // This should return the setpoint (can also be a constant)
         ShooterRPM,
         // This uses the output
-        output -> m_launcher.setFlywheelVoltage(output),
-        m_launcher 
+        output -> c_launcher.setFlywheelVoltage(output),
+        c_launcher 
     );
     // Use addRequirements() here to declare subsystem dependencies.
     // Configure additional PID options by calling `getController` here.

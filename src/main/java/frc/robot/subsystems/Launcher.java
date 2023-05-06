@@ -31,7 +31,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LauncherConstants;
-import frc.robot.Robot;
 
 /** */
 public class Launcher extends SubsystemBase {
@@ -82,19 +81,14 @@ public class Launcher extends SubsystemBase {
     aftFlywheelMotor.setVoltage(voltage);
   }
 
-  /** */
+  /** 
+   * @param voltage
+   */
   public void setHoodVoltage(double voltage) {
     double toApply;
 
     if (getHoodPosition() >= LauncherConstants.HOOD_MAX_ANGLE && voltage > 0) {
       toApply = 0; // if at or above max angle, cancel all + (up) voltages
-    } else if (Robot.isReal()) {
-      if (hoodLimitSwitchActivated() && voltage < 0) {
-        toApply = 0;
-      } else {
-        toApply = voltage;
-      } // if limit switch active (or at lower limit in sim), cancel all - (down)
-        // voltages
     } else {
       if (getHoodPosition() <= 0 && voltage < 0) {
         toApply = 0;
@@ -124,6 +118,10 @@ public class Launcher extends SubsystemBase {
                 flywheelEncoder.getVelocity())));
   }
 
+  public void shootCommand(double rpm) {
+    
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
@@ -136,6 +134,6 @@ public class Launcher extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putBoolean("Hood Limit Switch", hoodLimitSwitch.get());
     SmartDashboard.putNumber("Raw Hood Position:", hoodAngleEncoder.getRaw());
-    // SmartDashboard.putNumber("Calc Hood Position", hoodAngleEncoder.get);
+    SmartDashboard.putNumber("Calc Hood Position", getHoodPosition());
   }
 }
