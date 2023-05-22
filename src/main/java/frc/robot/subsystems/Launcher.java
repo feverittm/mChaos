@@ -60,6 +60,9 @@ public class Launcher extends SubsystemBase {
     hoodMotor.setInverted(LauncherConstants.HOOD_MOTOR_INVERTED);
     hoodMotor.configSelectedFeedbackSensor(LauncherConstants.HOOD_FEEDBACK_DEVICE);
     hoodMotor.setSensorPhase(LauncherConstants.HOOD_ENCODER_INVERTED);
+
+    // Resets the encoder to read a distance of zero
+    hoodAngleEncoder.reset();
   }
 
   /**
@@ -81,7 +84,7 @@ public class Launcher extends SubsystemBase {
     aftFlywheelMotor.setVoltage(voltage);
   }
 
-  /** 
+  /**
    * @param voltage
    */
   public void setHoodVoltage(double voltage) {
@@ -90,7 +93,7 @@ public class Launcher extends SubsystemBase {
     if (getHoodPosition() >= LauncherConstants.HOOD_MAX_ANGLE && voltage > 0) {
       toApply = 0; // if at or above max angle, cancel all + (up) voltages
     } else {
-      if (getHoodPosition() <= 0 && voltage < 0) {
+      if (hoodLimitSwitch.get() && hoodAngleEncoder.get() <= 0 && voltage < 0) {
         toApply = 0;
       } else {
         toApply = voltage;
@@ -119,7 +122,7 @@ public class Launcher extends SubsystemBase {
   }
 
   public void shootCommand(double rpm) {
-    
+
   }
 
   @Override
@@ -134,6 +137,8 @@ public class Launcher extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putBoolean("Hood Limit Switch", hoodLimitSwitch.get());
     SmartDashboard.putNumber("Raw Hood Position:", hoodAngleEncoder.getRaw());
-    SmartDashboard.putNumber("Calc Hood Position", getHoodPosition());
+    SmartDashboard.putNumber("Basic Hood Position:", hoodAngleEncoder.get());
+    SmartDashboard.putNumber("Calc. Hood Position", getHoodPosition());
+    SmartDashboard.putNumber("Flywheel Velocity", getFlywheelVelocityRadiansPerSecond());
   }
 }
