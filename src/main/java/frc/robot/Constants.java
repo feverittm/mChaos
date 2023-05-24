@@ -110,8 +110,8 @@ public final class Constants {
     public static final int LOWER_BREAKBEAM_DIO = 1;
     public static final int UPPER_BREAKBEAM_DIO = 0;
 
-    public static final boolean LOWER_BREAMBEAM_BALL_PRESENT_WHEN_TRUE = true;
-    public static final boolean UPPER_BREAKBEAM_BALL_PRESENT_WHEN_TRUE = true;
+    public static final boolean LOWER_BREAMBEAM_BALL_PRESENT_WHEN_TRUE = false;
+    public static final boolean UPPER_BREAKBEAM_BALL_PRESENT_WHEN_TRUE = false;
 
     public static final int INTAKE_MOTOR_CURRENT_LIMIT = 40;
   }

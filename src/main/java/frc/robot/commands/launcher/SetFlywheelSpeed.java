@@ -22,7 +22,7 @@ public class SetFlywheelSpeed extends PIDCommand {
             , Constants.LauncherConstants.FLYWHEEL_KD
             ),
         // This should return the measurement
-        c_launcher::getFlywheelVelocityRadiansPerSecond,
+        c_launcher::getFlywheelVelocity,
         // This should return the setpoint (can also be a constant)
         ShooterRPM,
         // This uses the output

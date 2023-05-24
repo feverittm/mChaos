@@ -58,6 +58,15 @@ public class Launcher extends SubsystemBase {
                 flywheelEncoder.getVelocity())));
   }
 
+    /**
+   * @return
+   */
+  public double getFlywheelVelocity() {
+    return flywheelVelocityFilter.calculate(
+        LauncherConstants.MOTOR_TO_FLYWHEEL.outputFromInput(
+                flywheelEncoder.getVelocity()));
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
@@ -67,6 +76,7 @@ public class Launcher extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("Flywheel Velocity (RPM)", flywheelEncoder.getVelocity());
     SmartDashboard.putNumber("Flywheel Velocity", getFlywheelVelocityRadiansPerSecond());
   }
 }
