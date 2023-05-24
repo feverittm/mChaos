@@ -8,8 +8,8 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.launcher.SetFlywheelSpeed;
-import frc.robot.commands.launcher.SetHoodPosition;
 import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Launcher;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -37,28 +37,17 @@ public class mChaos {
   private final Drive m_drive = new Drive();
   private final Indexer m_indexer = new Indexer();
   private final Launcher m_launcher = new Launcher();
+  private final Hood m_hood = new Hood();
 
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
 
   // Retained command references
-  private final Command m_hoodStop = Commands.run(() -> m_launcher.setHoodVoltage(0.0));
-  private final Command m_hoodUp = Commands.run(() -> m_launcher.setHoodVoltage(0.3));
-  private final Command m_hoodDown = Commands.run(() -> m_launcher.setHoodVoltage(-0.3));
+  private final Command m_hoodStop = Commands.runOnce(() -> m_hood.setHoodVoltage(0.0), m_hood);
+  private final Command m_hoodUp = Commands.run(() -> m_hood.setHoodVoltage(0.3));
+  private final Command m_hoodDown = Commands.run(() -> m_hood.setHoodVoltage(-0.3));
   
   private final Command m_indexBall = Commands.runOnce(() -> m_indexer.indexBall());
-
-  private final Command m_setHoodPosition = new SetHoodPosition(100, m_launcher);
-
-  // Autonomous commands
-  private final Command m_simpleAuto = Commands.run(
-    // Drive forward for 2 meters at half speed with a 3 second timeout
-    () -> m_drive.driveDistanceCommand(AutoConstants.kDriveDistanceMeters, AutoConstants.kDriveSpeed)
-      .withTimeout(AutoConstants.kTimeoutSeconds),
-      m_drive
-  );
-
-  SendableChooser<Command> m_chooser = new SendableChooser<>();
  
   /**
    * Use this method to define bindings between conditions and commands. These are
@@ -75,20 +64,18 @@ public class mChaos {
   public mChaos() {
     configureBindings();
 
-    m_chooser.setDefaultOption("Simple Auto", m_simpleAuto);
-
     // Control the drive with split-stick arcade controls
     m_drive.setDefaultCommand(
       Commands.run(
         () ->
-          m_drive.arcadeDriveCommand(
+          m_drive.arcadeDrive(
             -m_driverController.getLeftY(), -m_driverController.getRightX()),
           m_drive));
 
-    Shuffleboard.getTab("Autonomous").add(m_chooser);
     Shuffleboard.getTab("Drive").add(m_drive);
     Shuffleboard.getTab("Launcher").add(m_launcher);
     Shuffleboard.getTab("Indexer").add(m_indexer);
+    Shuffleboard.getTab("Indexer").add(m_hood);
 
     // Set the scheduler to log Shuffleboard events for command initialize, interrupt, finish
     CommandScheduler.getInstance()
@@ -124,24 +111,10 @@ public class mChaos {
 
     m_driverController.a().whileTrue(m_hoodUp).onFalse(m_hoodStop);
     m_driverController.b().whileTrue(m_hoodDown).onFalse(m_hoodStop);
-    m_driverController.rightBumper().onTrue(m_setHoodPosition);
 
     m_driverController.x().onTrue(m_indexBall);
     m_driverController.leftBumper().toggleOnTrue(
       new SetFlywheelSpeed(Constants.LauncherConstants.kShooterTargetRPS, m_launcher)
     );
-  }
-
-  /**
-   * Use this to define the command that runs during autonomous.
-   *
-   * <p>
-   * Scheduled during {@link Robot#autonomousInit()}.
-   */
-  public CommandBase getAutonomousCommand() {
-    // Drive forward for 2 meters at half speed with a 3 second timeout
-    return m_drive
-        .driveDistanceCommand(AutoConstants.kDriveDistanceMeters, AutoConstants.kDriveSpeed)
-        .withTimeout(AutoConstants.kTimeoutSeconds);
   }
 }

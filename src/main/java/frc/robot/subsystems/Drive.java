@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
@@ -43,46 +42,48 @@ public class Drive extends SubsystemBase {
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_rightMotors.setInverted(true);
+    m_rightMotors.setInverted(DriveConstants.INVERT_RIGHT);
+    m_leftMotors.setInverted(DriveConstants.INVERT_LEFT);
 
     // Sets the distance per pulse for the encoders
     m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
     m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
   }
 
-  /**
-   * Returns a command that drives the robot with arcade controls.
+    /**
+   * Drives the robot using arcade controls.
    *
    * @param fwd the commanded forward movement
    * @param rot the commanded rotation
    */
-  public CommandBase arcadeDriveCommand(double fwd, double rot) {
-    // A split-stick arcade command, with forward/backward controlled by the left
-    // hand, and turning controlled by the right.
-    return run(() -> m_drive.arcadeDrive(fwd, rot))
-        .withName("arcadeDrive");
+  public void arcadeDrive (double fwd, double rot) {
+    m_drive.arcadeDrive(fwd, rot);
+  }
+
+  public void setOutput(double left, double right) {
+    m_leftMotors.set(left);
+    m_rightMotors.set(right);
+  }
+
+  /** Resets the drive encoders to currently read a position of 0. */
+  public void resetEncoders() {
+    m_leftEncoder.reset();
+    m_rightEncoder.reset();
   }
 
   /**
-   * Returns a command that drives the robot forward a specified distance at a
-   * specified speed.
+   * Sets the max output of the drive. Useful for scaling the drive to drive more slowly.
    *
-   * @param distanceMeters The distance to drive forward in meters
-   * @param speed          The fraction of max speed at which to drive
+   * @param maxOutput the maximum output to which the drive will be constrained
    */
-  public CommandBase driveDistanceCommand(double distanceMeters, double speed) {
-    return runOnce(
-        () -> {
-          // Reset encoders at the start of the command
-          m_leftEncoder.reset();
-          m_rightEncoder.reset();
-        })
-        // Drive forward at specified speed
-        .andThen(run(() -> m_drive.arcadeDrive(speed, 0)))
-        // End command when we've traveled the specified distance
-        .until(
-            () -> Math.max(m_leftEncoder.getDistance(), m_rightEncoder.getDistance()) >= distanceMeters)
-        // Stop the drive when the command ends
-        .finallyDo(interrupted -> m_drive.stopMotor());
+  public void setMaxOutput(double maxOutput) {
+    m_drive.setMaxOutput(maxOutput);
   }
+
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+  }
+
+  
 }

@@ -28,6 +28,8 @@ public final class Constants {
     public static final int kLeftMotor2CANID = 3;
     public static final int kRightMotor1CANID = 2;
     public static final int kRightMotor2CANID = 4;
+    public static final boolean INVERT_LEFT = true;
+    public static final boolean INVERT_RIGHT = false;
 
     public static final int[] kLeftEncoderDIOs = { 4, 5 };
     public static final int[] kRightEncoderDIOs = { 2, 3 };
@@ -52,7 +54,7 @@ public final class Constants {
     public static final int[] HOOD_ENCODER_DIO_CHANNEL = { 7, 8 };
     public static final boolean HOOD_ENCODER_INVERTED = false;
     public static final int HOOD_LIMIT_SWITCH_DIO = 6;
-    public static final boolean HOOD_LIMIT_SWITCH_TRUE_WHEN_ACTIVATED = true;
+    public static final boolean HOOD_LIMIT_SWITCH_TRUE_WHEN_ACTIVATED = false;
     public static final FeedbackDevice HOOD_FEEDBACK_DEVICE = FeedbackDevice.QuadEncoder;
     public static final int HOOD_ENCODER_CPR = 2048;
 
@@ -68,7 +70,7 @@ public final class Constants {
     public static final int FLYWHEEL_ENCODER_VELOCITY_SMOOTHING_SAMPLES = 10;
     public static final int HOOD_ENCODER_VELOCITY_SMOOTHING_SAMPLES = 10;
 
-    public static final double HOOD_MAX_ANGLE = Math.PI / 2;
+    public static final double HOOD_MAX_ANGLE = 1000;
 
     public static final double HOOD_MOMENT = 0.0086; // kg m^2
     public static final double HOOD_RADIUS_METERS = 0.5;

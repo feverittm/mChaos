@@ -31,7 +31,6 @@ public class Indexer extends SubsystemBase {
   private final WPI_VictorSPX intakeMotor = new WPI_VictorSPX(IndexerConstants.INDEXER_MOTOR_CANID);
 
   private final DigitalInput lowerBreakbeam = new DigitalInput(IndexerConstants.LOWER_BREAKBEAM_DIO);
-
   private final DigitalInput upperBreakbeam = new DigitalInput(IndexerConstants.UPPER_BREAKBEAM_DIO);
 
   private final Timer m_timer = new Timer();
